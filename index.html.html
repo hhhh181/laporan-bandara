@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Laporan Kerusakan Bandara</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: linear-gradient(to right, #ffd200, #007bff);
+  padding: 20px;
+}
+.container {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 500px;
+  margin: auto;
+}
+h2 { text-align: center; }
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+}
+button {
+  background: #007bff;
+  color: white;
+  padding: 12px;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  font-size: 16px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+<h2>Laporan Kerusakan</h2>
+
+<label>Unit</label>
+<select id="unit">
+  <option>Bangland</option>
+  <option>AVSEC</option>
+  <option>ELBAN</option>
+  <option>PKP-PK</option>
+  <option>Kantor</option>
+</select>
+
+<label>Nama Peralatan</label>
+<input type="text" id="alat">
+
+<label>Lokasi</label>
+<input type="text" id="lokasi" readonly>
+
+<label>Deskripsi</label>
+<textarea id="kerusakan"></textarea>
+
+<label>Foto</label>
+<input type="file" id="foto">
+
+<button onclick="ambilLokasi()">📍 Ambil Lokasi</button>
+<button onclick="kirimData()">🚀 Kirim Laporan</button>
+
+</div>
+
+<script>
+
+// 📍 Ambil GPS
+function ambilLokasi(){
+  navigator.geolocation.getCurrentPosition(function(pos){
+    document.getElementById("lokasi").value =
+      pos.coords.latitude + "," + pos.coords.longitude;
+  });
+}
+
+// 📤 Kirim
+function kirimData(){
+
+  var unit = document.getElementById("unit").value;
+  var alat = document.getElementById("alat").value;
+  var lokasi = document.getElementById("lokasi").value;
+  var kerusakan = document.getElementById("kerusakan").value;
+
+  // 🔀 Nomor berbeda tiap unit
+  var nomor = "";
+  if(unit=="Bangland") nomor="628111111111";
+  if(unit=="AVSEC") nomor="628222222222";
+  if(unit=="ELBAN") nomor="628333333333";
+  if(unit=="PKP-PK") nomor="628444444444";
+  if(unit=="Kantor") nomor="628555555555";
+
+  var pesan = `LAPORAN KERUSAKAN\n\n`
+    + `Unit: ${unit}\n`
+    + `Peralatan: ${alat}\n`
+    + `Lokasi: ${lokasi}\n`
+    + `Kerusakan: ${kerusakan}`;
+
+  // 📱 WhatsApp
+  var url = `https://wa.me/${nomor}?text=` + encodeURIComponent(pesan);
+  window.open(url);
+
+  // 📊 Kirim ke Google Sheet
+  fetch("URL_SCRIPT_KAMU", {
+    method: "POST",
+    body: JSON.stringify({
+      unit, alat, lokasi, kerusakan
+    })
+  });
+
+}
+</script>
+
+</body>
+</html>
